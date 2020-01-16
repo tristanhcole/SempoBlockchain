@@ -142,13 +142,15 @@ BASIC_AUTH_CREDENTIALS = {
 
 REDIS_URL = 'redis://' + specific_parser['REDIS']['URI']
 
-DATABASE_USER = specific_parser['DATABASE'].get('user') \
-                or '{}_{}'.format(common_parser['DATABASE']['user'],DEPLOYMENT_NAME.replace("-", "_"))
+DATABASE_USER = os.environ.get("DATABASE_USER") or specific_parser['DATABASE'].get('user') \
+                or '{}_{}'.format(common_parser['DATABASE']['user'], DEPLOYMENT_NAME.replace("-", "_"))
 
 DATABASE_HOST = specific_parser['DATABASE']['host']
 
 DATABASE_NAME = specific_parser['DATABASE'].get('database') \
                 or common_parser['DATABASE']['database']
+
+DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD") or specific_parser['DATABASE']['password']
 
 ETH_DATABASE_NAME = specific_parser['DATABASE'].get('eth_database') \
                     or common_parser['DATABASE']['eth_database']
@@ -159,7 +161,7 @@ ETH_WORKER_DB_POOL_OVERFLOW = specific_parser['DATABASE'].getint('eth_worker_poo
 
 def get_database_uri(name, host, censored=True):
     return 'postgresql://{}:{}@{}:{}/{}'.format(DATABASE_USER,
-                                                '*******' if censored else specific_parser['DATABASE']['password'],
+                                                '*******' if censored else DATABASE_PASSWORD,
                                                 host,
                                                 common_parser['DATABASE']['port'],
                                                 name)
