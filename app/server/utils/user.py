@@ -274,6 +274,7 @@ def create_transfer_account_user(first_name=None, last_name=None, preferred_lang
             transfer_account.token = token
 
         if not is_self_sign_up:
+            initial_disbursement = organisation.initial_disbursement_amount or initial_disbursement
             transfer_account.approve_and_disburse(initial_disbursement=initial_disbursement)
 
         db.session.add(transfer_account)
