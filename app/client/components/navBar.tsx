@@ -1,41 +1,37 @@
-import React from "react";
+import * as React from "react";
 import MediaQuery from "react-responsive";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import { LoginAction } from "../reducers/auth/actions";
+import { LoginState } from "../reducers/auth/loginReducer";
+import { ReduxState } from "../reducers/rootReducer";
 import { replaceSpaces } from "../utils";
+import { UpdateActiveOrgPayload } from "../reducers/auth/types";
 
-const mapStateToProps = state => {
-  return {
-    loggedIn: state.login.token != null,
-    login: state.login,
-    email: state.login.email,
-    orgName: replaceSpaces(state.login.organisationName)
-  };
-};
+interface StateProps {
+  loggedIn: string;
+  login: LoginState;
+  email: string;
+  orgName: string;
+}
 
-const mapDispatchToProps = dispatch => {
-  return {
-    updateActiveOrgRequest: (
-      organisationName,
-      organisationId,
-      organisationToken
-    ) =>
-      dispatch(
-        LoginAction.updateActiveOrgRequest({
-          organisationName,
-          organisationId,
-          organisationToken
-        })
-      )
-  };
-};
+interface DispatchProps {
+  updateActiveOrgRequest: (payload: UpdateActiveOrgPayload) => any;
+}
 
-class NavBar extends React.Component {
-  constructor() {
-    super();
+type Props = DispatchProps & StateProps;
+
+interface State {
+  iconURL: string;
+  mobileMenuOpen: boolean;
+  isOrgSwitcherActive: boolean;
+}
+
+class NavBar extends React.Component<Props, State> {
+  constructor(props) {
+    super(props);
     this.state = {
       iconURL: "/static/media/sempo_icon.svg",
       mobileMenuOpen: false,
@@ -79,7 +75,11 @@ class NavBar extends React.Component {
 
   selectOrg(org) {
     this.setState({ isOrgSwitcherActive: false }, () =>
-      this.props.updateActiveOrgRequest(org.name, org.id, org.token)
+      this.props.updateActiveOrgRequest({
+        organisationName: org.name,
+        organisationId: org.id,
+        organisationToken: org.token
+      })
     );
   }
 
@@ -109,10 +109,6 @@ class NavBar extends React.Component {
   }
 
   render() {
-    let deploymentName = window.DEPLOYMENT_NAME;
-    let beneficiaryTermPlural = window.BENEFICIARY_TERM_PLURAL;
-    let beneficiaryURL = "/" + beneficiaryTermPlural.toLowerCase();
-
     var tracker_link =
       window.ETH_EXPLORER_URL +
       "/address/" +
@@ -270,9 +266,26 @@ class NavBar extends React.Component {
     }
   }
 }
+
+const mapStateToProps = (state: ReduxState) => {
+  return {
+    loggedIn: state.login.token != null,
+    login: state.login,
+    email: state.login.email,
+    orgName: replaceSpaces(state.login.organisationName)
+  };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    updateActiveOrgRequest: (payload: UpdateActiveOrgPayload) =>
+      dispatch(LoginAction.updateActiveOrgRequest(payload))
+  };
+};
+
 export default connect(mapStateToProps, mapDispatchToProps)(NavBar);
 
-const SideBarWrapper = styled.div`
+const SideBarWrapper = styled.div<any>`
   width: 234px;
   position: fixed;
   left: 0;
@@ -289,7 +302,7 @@ const SideBarWrapper = styled.div`
   }
 `;
 
-const NavWrapper = styled.div`
+const NavWrapper = styled.div<any>`
   @media (max-width: 767px) {
     display: ${props => (props.mobileMenuOpen ? "" : "none")};
   }

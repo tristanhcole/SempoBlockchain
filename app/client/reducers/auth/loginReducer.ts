@@ -2,7 +2,7 @@ import { LoginAction } from "./actions";
 
 import { LoginActionTypes } from "./types";
 
-interface LoginState {
+export interface LoginState {
   isLoggingIn: boolean;
   //TODO(refactor): what is token actually? seems to only be used in checking it's not null
   token: null | string;
@@ -22,9 +22,15 @@ interface LoginState {
   tfaURL: null | string;
   tfaFailure: boolean;
   //TODO(refactor): what is this actually?
-  organisations?: null | string[];
+  organisations?: null | Organisation[];
   requireTransferCardExists: null | boolean;
   adminTier?: string;
+}
+
+interface Organisation {
+  name: string;
+  id: number;
+  token: string;
 }
 
 const initialLoginState: LoginState = {
