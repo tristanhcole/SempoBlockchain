@@ -1,3 +1,5 @@
+import { Organisation } from "../organisation/types";
+
 export enum LoginActionTypes {
   REAUTH_REQUEST = "REAUTH_REQUEST",
   LOGIN_REQUEST = "LOGIN_REQUEST",
@@ -6,12 +8,6 @@ export enum LoginActionTypes {
   LOGIN_PARTIAL = "LOGIN_PARTIAL",
   LOGIN_SUCCESS = "LOGIN_SUCCESS",
   LOGIN_FAILURE = "LOGIN_FAILURE"
-}
-
-export interface UpdateActiveOrgPayload {
-  organisationName: string;
-  organisationId: number;
-  organisationToken: string;
 }
 
 export interface LoginRequestPayload {
@@ -38,7 +34,7 @@ export interface LoginSuccessPayload {
   organisationId: null | number;
   organisationToken: null | string;
   usdToSatoshiRate: null | number;
-  organisations?: string[];
+  organisations?: Organisation[];
   requireTransferCardExists: null | boolean;
   adminTier?: string;
 }

@@ -11,7 +11,6 @@ import {
   ResetPasswordActionTypes,
   ResetPasswordPayload,
   EditAdminUserActionTypes,
-  UpdateActiveOrgPayload,
   UpdateUserPayload,
   LoadAdminUserListActionTypes,
   ValidateTfaActionTypes,
@@ -28,9 +27,10 @@ import {
 } from "./types";
 
 import { createAction, ActionsUnion } from "../../reduxUtils";
+import { Organisation } from "../organisation/types";
 
 export const LoginAction = {
-  updateActiveOrgRequest: (payload: UpdateActiveOrgPayload) =>
+  updateActiveOrgRequest: (payload: Organisation) =>
     createAction(LoginActionTypes.UPDATE_ACTIVE_ORG, payload),
   reauthRequest: () => createAction(LoginActionTypes.REAUTH_REQUEST),
   loginRequest: (payload: LoginRequestPayload) =>

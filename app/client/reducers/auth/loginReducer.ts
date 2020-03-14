@@ -1,6 +1,7 @@
 import { LoginAction } from "./actions";
 
 import { LoginActionTypes } from "./types";
+import { Organisation } from "../organisation/types";
 
 export interface LoginState {
   isLoggingIn: boolean;
@@ -21,16 +22,9 @@ export interface LoginState {
   error: null | string;
   tfaURL: null | string;
   tfaFailure: boolean;
-  //TODO(refactor): what is this actually?
   organisations?: null | Organisation[];
   requireTransferCardExists: null | boolean;
   adminTier?: string;
-}
-
-interface Organisation {
-  name: string;
-  id: number;
-  token: string;
 }
 
 const initialLoginState: LoginState = {
@@ -60,8 +54,8 @@ export const login = (state = initialLoginState, action: LoginAction) => {
     case LoginActionTypes.UPDATE_ACTIVE_ORG:
       return {
         ...state,
-        organisationName: action.payload.organisationName,
-        organisationId: action.payload.organisationId
+        organisationName: action.payload.name,
+        organisationId: action.payload.id
       };
     case LoginActionTypes.LOGIN_SUCCESS:
       return {

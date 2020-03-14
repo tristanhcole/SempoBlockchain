@@ -8,17 +8,17 @@ import { LoginAction } from "../reducers/auth/actions";
 import { LoginState } from "../reducers/auth/loginReducer";
 import { ReduxState } from "../reducers/rootReducer";
 import { replaceSpaces } from "../utils";
-import { UpdateActiveOrgPayload } from "../reducers/auth/types";
+import { Organisation } from "../reducers/organisation/types";
 
 interface StateProps {
-  loggedIn: string;
+  loggedIn: boolean;
   login: LoginState;
-  email: string;
+  email: string | null;
   orgName: string;
 }
 
 interface DispatchProps {
-  updateActiveOrgRequest: (payload: UpdateActiveOrgPayload) => any;
+  updateActiveOrgRequest: (payload: Organisation) => any;
 }
 
 type Props = DispatchProps & StateProps;
@@ -30,7 +30,7 @@ interface State {
 }
 
 class NavBar extends React.Component<Props, State> {
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       iconURL: "/static/media/sempo_icon.svg",
@@ -73,18 +73,17 @@ class NavBar extends React.Component<Props, State> {
     }));
   }
 
-  selectOrg(org) {
+  selectOrg(org: Organisation) {
     this.setState({ isOrgSwitcherActive: false }, () =>
-      this.props.updateActiveOrgRequest({
-        organisationName: org.name,
-        organisationId: org.id,
-        organisationToken: org.token
-      })
+      this.props.updateActiveOrgRequest(org)
     );
   }
 
   toggleSwitchOrgDropdown() {
-    if (this.props.login.organisations.length <= 1) {
+    if (
+      this.props.login.organisations == null ||
+      this.props.login.organisations.length <= 1
+    ) {
       return;
     }
 
@@ -93,7 +92,7 @@ class NavBar extends React.Component<Props, State> {
     }));
   }
 
-  imageExists(url, callback) {
+  imageExists(url: string, callback: (exists: boolean) => any) {
     var img = new Image();
     img.onload = function() {
       callback(true);
@@ -267,7 +266,7 @@ class NavBar extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: ReduxState) => {
+const mapStateToProps = (state: ReduxState): StateProps => {
   return {
     loggedIn: state.login.token != null,
     login: state.login,
@@ -278,12 +277,15 @@ const mapStateToProps = (state: ReduxState) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    updateActiveOrgRequest: (payload: UpdateActiveOrgPayload) =>
+    updateActiveOrgRequest: (payload: Organisation) =>
       dispatch(LoginAction.updateActiveOrgRequest(payload))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(NavBar);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NavBar);
 
 const SideBarWrapper = styled.div<any>`
   width: 234px;
