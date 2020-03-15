@@ -5,10 +5,9 @@ import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
 import { LoginAction } from "../reducers/auth/actions";
-import { LoginState } from "../reducers/auth/loginReducer";
+import { LoginState, OrganisationFlat } from "../reducers/auth/loginReducer";
 import { ReduxState } from "../reducers/rootReducer";
 import { replaceSpaces } from "../utils";
-import { Organisation } from "../reducers/organisation/types";
 
 interface StateProps {
   loggedIn: boolean;
@@ -18,7 +17,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  updateActiveOrgRequest: (payload: Organisation) => any;
+  updateActiveOrgRequest: (payload: OrganisationFlat) => any;
 }
 
 const initialState = Object.freeze({
@@ -29,6 +28,17 @@ const initialState = Object.freeze({
 
 type Props = DispatchProps & StateProps;
 type State = typeof initialState;
+
+declare global {
+  interface Window {
+    DEFAULT_INITIAL_DISBURSEMENT: number;
+    DEPLOYMENT_NAME: string;
+    ETH_EXPLORER_URL: string;
+    USING_EXTERNAL_ERC20: boolean;
+    master_wallet_address: string;
+    ETH_CONTRACT_ADDRESS: string;
+  }
+}
 
 class NavBar extends React.Component<Props, State> {
   readonly state = initialState;
@@ -67,7 +77,7 @@ class NavBar extends React.Component<Props, State> {
     }));
   }
 
-  selectOrg(org: Organisation) {
+  selectOrg(org: OrganisationFlat) {
     this.setState({ isOrgSwitcherActive: false }, () =>
       this.props.updateActiveOrgRequest(org)
     );
@@ -271,7 +281,7 @@ const mapStateToProps = (state: ReduxState): StateProps => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    updateActiveOrgRequest: (payload: Organisation) =>
+    updateActiveOrgRequest: (payload: OrganisationFlat) =>
       dispatch(LoginAction.updateActiveOrgRequest(payload))
   };
 };

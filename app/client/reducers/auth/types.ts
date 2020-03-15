@@ -1,4 +1,4 @@
-import { Organisation } from "../organisation/types";
+import { OrganisationFlat } from "./loginReducer";
 
 export enum LoginActionTypes {
   REAUTH_REQUEST = "REAUTH_REQUEST",
@@ -34,7 +34,7 @@ export interface LoginSuccessPayload {
   organisationId: null | number;
   organisationToken: null | string;
   usdToSatoshiRate: null | number;
-  organisations?: Organisation[];
+  organisations?: OrganisationFlat[];
   requireTransferCardExists: null | boolean;
   adminTier?: string;
 }

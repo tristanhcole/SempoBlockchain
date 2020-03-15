@@ -33,11 +33,6 @@ declare global {
   interface Window {
     BENEFICIARY_TERM: string;
     DEFAULT_INITIAL_DISBURSEMENT: number;
-    DEPLOYMENT_NAME: string;
-    ETH_EXPLORER_URL: string;
-    USING_EXTERNAL_ERC20: boolean;
-    master_wallet_address: string;
-    ETH_CONTRACT_ADDRESS: string;
   }
 }
 
@@ -168,4 +163,7 @@ const mapDispatchToProps = (dispatch: any) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateUserUpdated);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateUserUpdated);

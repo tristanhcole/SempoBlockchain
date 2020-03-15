@@ -96,12 +96,12 @@ function* updateStateFromAdmin(data) {
 
 function* saveOrgId({ payload }) {
   try {
-    yield call(storeOrgid, payload.organisationId.toString());
+    yield call(storeOrgid, payload.id.toString());
 
     let query_params = parseQuery(window.location.search);
 
     // if query param and payload are matching then just reload to update navbar
-    if (query_params["org"] && payload.organisationId == query_params["org"]) {
+    if (query_params["org"] && payload.id == query_params["org"]) {
       window.location.reload();
     } else {
       window.location.assign("/");

@@ -22,9 +22,15 @@ export interface LoginState {
   error: null | string;
   tfaURL: null | string;
   tfaFailure: boolean;
-  organisations?: null | Organisation[];
+  organisations?: null | OrganisationFlat[];
   requireTransferCardExists: null | boolean;
   adminTier?: string;
+}
+
+export interface OrganisationFlat {
+  id: number;
+  name: string;
+  token: string;
 }
 
 const initialLoginState: LoginState = {

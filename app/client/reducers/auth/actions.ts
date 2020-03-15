@@ -27,10 +27,10 @@ import {
 } from "./types";
 
 import { createAction, ActionsUnion } from "../../reduxUtils";
-import { Organisation } from "../organisation/types";
+import { OrganisationFlat } from "./loginReducer";
 
 export const LoginAction = {
-  updateActiveOrgRequest: (payload: Organisation) =>
+  updateActiveOrgRequest: (payload: OrganisationFlat) =>
     createAction(LoginActionTypes.UPDATE_ACTIVE_ORG, payload),
   reauthRequest: () => createAction(LoginActionTypes.REAUTH_REQUEST),
   loginRequest: (payload: LoginRequestPayload) =>
