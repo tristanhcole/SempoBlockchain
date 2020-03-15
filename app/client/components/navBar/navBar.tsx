@@ -53,8 +53,6 @@ class NavBar extends React.Component<Props, State> {
       deploymentName === "dev" ? "svg" : "png"
     }`;
 
-    console.log("Custom URL is", custom_url);
-
     this.imageExists(custom_url, exists => {
       if (exists) {
         this.setState({
@@ -302,22 +300,6 @@ const SideBarWrapper = styled.div<any>`
 const NavWrapper = styled.div<any>`
   @media (max-width: 767px) {
     display: ${props => (props.mobileMenuOpen ? "" : "none")};
-  }
-`;
-
-const Title = styled.h2`
-  color: #fff;
-  margin: auto 1em;
-  font-size: 22px;
-  font-weight: 600;
-  text-decoration: none;
-  letter-spacing: 1.5px;
-  @media (max-width: 767px) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 16px;
-    line-height: 1;
-    text-align: center;
   }
 `;
 
