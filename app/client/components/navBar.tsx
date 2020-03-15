@@ -21,23 +21,17 @@ interface DispatchProps {
   updateActiveOrgRequest: (payload: Organisation) => any;
 }
 
-type Props = DispatchProps & StateProps;
+const initialState = Object.freeze({
+  iconURL: "/static/media/sempo_icon.svg",
+  mobileMenuOpen: false,
+  isOrgSwitcherActive: false
+});
 
-interface State {
-  iconURL: string;
-  mobileMenuOpen: boolean;
-  isOrgSwitcherActive: boolean;
-}
+type Props = DispatchProps & StateProps;
+type State = typeof initialState;
 
 class NavBar extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      iconURL: "/static/media/sempo_icon.svg",
-      mobileMenuOpen: false,
-      isOrgSwitcherActive: false
-    };
-  }
+  readonly state = initialState;
 
   componentWillMount() {
     let deploymentName = window.DEPLOYMENT_NAME;
