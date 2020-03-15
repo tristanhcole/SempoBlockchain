@@ -4,23 +4,19 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-import { LoginAction } from "../../reducers/auth/actions";
-import { LoginState, OrganisationFlat } from "../../reducers/auth/loginReducer";
+import { LoginState } from "../../reducers/auth/loginReducer";
 import { ReduxState } from "../../reducers/rootReducer";
 import { replaceSpaces } from "../../utils";
-import { SVG, StyledLogoLink } from "./styles";
 import MobileTopBar from "./MobileTopBar";
+import OrgSwitcher from "./OrgSwitcher";
 
 interface StateProps {
   loggedIn: boolean;
-  login: LoginState;
   email: string | null;
   orgName: string;
 }
 
-interface DispatchProps {
-  updateActiveOrgRequest: (payload: OrganisationFlat) => any;
-}
+interface DispatchProps {}
 
 const initialState = Object.freeze({
   iconURL: "/static/media/sempo_icon.svg",
@@ -66,34 +62,11 @@ class NavBar extends React.Component<Props, State> {
     this.setState({ mobileMenuOpen: false });
   }
 
-  handleClick() {
-    this.setState({ mobileMenuOpen: false });
-  }
-
-  openMobileMenu() {
+  openMobileMenu = () => {
     this.setState(prevState => ({
       mobileMenuOpen: !prevState.mobileMenuOpen
     }));
-  }
-
-  selectOrg(org: OrganisationFlat) {
-    this.setState({ isOrgSwitcherActive: false }, () =>
-      this.props.updateActiveOrgRequest(org)
-    );
-  }
-
-  toggleSwitchOrgDropdown() {
-    if (
-      this.props.login.organisations == null ||
-      this.props.login.organisations.length <= 1
-    ) {
-      return;
-    }
-
-    this.setState(prevState => ({
-      isOrgSwitcherActive: !prevState.isOrgSwitcherActive
-    }));
-  }
+  };
 
   imageExists(url: string, callback: (exists: boolean) => any) {
     var img = new Image();
@@ -106,9 +79,7 @@ class NavBar extends React.Component<Props, State> {
     img.src = url;
   }
 
-  _closeMobileMenu() {
-    this.setState({ mobileMenuOpen: false });
-  }
+  closeMobileMenu = () => this.setState({ mobileMenuOpen: false });
 
   render() {
     var tracker_link =
@@ -118,127 +89,43 @@ class NavBar extends React.Component<Props, State> {
         ? window.master_wallet_address
         : window.ETH_CONTRACT_ADDRESS);
 
-    var orgs = this.props.login.organisations;
-    if (orgs === null || typeof orgs === "undefined") {
-      orgs = [];
-    }
+    let { loggedIn, email } = this.props;
+    let { iconURL, mobileMenuOpen } = this.state;
 
-    if (this.props.loggedIn) {
+    if (loggedIn) {
       return (
         <div>
-          <SideBarWrapper mobileMenuOpen={this.state.mobileMenuOpen}>
+          <SideBarWrapper mobileMenuOpen={mobileMenuOpen}>
             <Mobile>
               <MobileTopBar
-                iconUrl={this.state.iconURL}
-                email={this.props.email}
-                menuOpen={this.state.mobileMenuOpen}
-                onPress={() => this.openMobileMenu()}
+                iconUrl={iconURL}
+                email={email}
+                menuOpen={mobileMenuOpen}
+                onPress={this.openMobileMenu}
               />
             </Mobile>
 
             <SideBarNavigationItems>
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <Default>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      cursor: "pointer"
-                    }}
-                  >
-                    <StyledLogoLink
-                      to="/"
-                      onClick={() => this._closeMobileMenu()}
-                    >
-                      <SVG src={this.state.iconURL} />
-                    </StyledLogoLink>
-                    <div
-                      style={{
-                        display: "flex",
-                        width: "100%",
-                        justifyContent: "space-between"
-                      }}
-                      onClick={() => this.toggleSwitchOrgDropdown()}
-                    >
-                      <div style={{ margin: "auto 0", maxWidth: "100px" }}>
-                        <BoldedNavBarHeaderText>
-                          {this.props.login.organisationName}
-                        </BoldedNavBarHeaderText>
-                        <StandardNavBarHeaderText>
-                          {this.props.email}
-                        </StandardNavBarHeaderText>
-                      </div>
-                      {orgs.length <= 1 ? null : (
-                        <SVG
-                          style={{ padding: "0 0.5em 0 0", width: "30px" }}
-                          src={"/static/media/angle-down.svg"}
-                        />
-                      )}
-                    </div>
-                  </div>
-                  <DropdownContent
-                    style={{
-                      display: this.state.isOrgSwitcherActive
-                        ? "block"
-                        : "none",
-                      zIndex: 99
-                    }}
-                  >
-                    <DropdownContentTitle>
-                      Switch Organisation
-                    </DropdownContentTitle>
-                    {orgs.map(org => {
-                      return (
-                        <DropdownContentText
-                          key={org.id}
-                          onClick={() => this.selectOrg(org)}
-                        >
-                          {org.name}
-                        </DropdownContentText>
-                      );
-                    })}
-                  </DropdownContent>
-                  <div
-                    style={{
-                      display: this.state.isOrgSwitcherActive
-                        ? "block"
-                        : "none",
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      zIndex: 98,
-                      width: "100vw",
-                      height: "100vh"
-                    }}
-                    onClick={() => this.toggleSwitchOrgDropdown()}
-                  />
+                  <OrgSwitcher
+                    icon={iconURL}
+                    selfPress={this.closeMobileMenu}
+                  ></OrgSwitcher>
                 </Default>
 
-                <NavWrapper mobileMenuOpen={this.state.mobileMenuOpen}>
+                <NavWrapper mobileMenuOpen={mobileMenuOpen}>
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    <StyledLink
-                      to="/"
-                      exact
-                      onClick={() => this._closeMobileMenu()}
-                    >
+                    <StyledLink to="/" exact onClick={this.closeMobileMenu}>
                       Dashboard
                     </StyledLink>
-                    <StyledLink
-                      to="/accounts"
-                      onClick={() => this._closeMobileMenu()}
-                    >
+                    <StyledLink to="/accounts" onClick={this.closeMobileMenu}>
                       Accounts
                     </StyledLink>
-                    <StyledLink
-                      to="/transfers"
-                      onClick={() => this._closeMobileMenu()}
-                    >
+                    <StyledLink to="/transfers" onClick={this.closeMobileMenu}>
                       Transfers
                     </StyledLink>
-                    <StyledLink
-                      to="/settings"
-                      onClick={() => this._closeMobileMenu()}
-                    >
+                    <StyledLink to="/settings" onClick={this.closeMobileMenu}>
                       Settings
                     </StyledLink>
                   </div>
@@ -262,23 +149,12 @@ class NavBar extends React.Component<Props, State> {
 const mapStateToProps = (state: ReduxState): StateProps => {
   return {
     loggedIn: state.login.token != null,
-    login: state.login,
     email: state.login.email,
     orgName: replaceSpaces(state.login.organisationName)
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    updateActiveOrgRequest: (payload: OrganisationFlat) =>
-      dispatch(LoginAction.updateActiveOrgRequest(payload))
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(NavBar);
+export default connect(mapStateToProps)(NavBar);
 
 const SideBarWrapper = styled.div<any>`
   width: 234px;
@@ -343,51 +219,4 @@ const ContractAddress = styled.a`
     right: 0;
     color: #85898c;
   }
-`;
-
-const StandardNavBarHeaderText = styled.p`
-  color: #fff;
-  margin: 0;
-  font-size: 12px;
-  text-decoration: none;
-  text-overflow: ellipsis;
-  overflow: auto;
-  overflow-x: hidden;
-`;
-
-const BoldedNavBarHeaderText = styled(StandardNavBarHeaderText)`
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-`;
-
-const DropdownContent = styled.div`
-  display: none;
-  position: absolute;
-  top: 74px;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  width: 234px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-`;
-
-const DropdownContentText = styled.p`
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  margin: 0;
-  border-bottom: 0.5px solid #80808059;
-  &:hover {
-    background-color: #f1f1f1;
-  }
-`;
-
-const DropdownContentTitle = styled(DropdownContentText)`
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: bold;
-  color: grey;
-  padding: 5px 16px;
 `;
