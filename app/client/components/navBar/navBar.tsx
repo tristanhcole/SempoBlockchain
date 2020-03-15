@@ -1,13 +1,13 @@
 import * as React from "react";
-import MediaQuery from "react-responsive";
+import { Mobile, Default } from "../helpers/responsive";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-import { LoginAction } from "../reducers/auth/actions";
-import { LoginState, OrganisationFlat } from "../reducers/auth/loginReducer";
-import { ReduxState } from "../reducers/rootReducer";
-import { replaceSpaces } from "../utils";
+import { LoginAction } from "../../reducers/auth/actions";
+import { LoginState, OrganisationFlat } from "../../reducers/auth/loginReducer";
+import { ReduxState } from "../../reducers/rootReducer";
+import { replaceSpaces } from "../../utils";
 
 interface StateProps {
   loggedIn: boolean;
@@ -31,7 +31,6 @@ type State = typeof initialState;
 
 declare global {
   interface Window {
-    DEFAULT_INITIAL_DISBURSEMENT: number;
     DEPLOYMENT_NAME: string;
     ETH_EXPLORER_URL: string;
     USING_EXTERNAL_ERC20: boolean;
@@ -128,7 +127,7 @@ class NavBar extends React.Component<Props, State> {
       return (
         <div>
           <SideBarWrapper mobileMenuOpen={this.state.mobileMenuOpen}>
-            <MediaQuery maxWidth={767}>
+            <Mobile>
               <MobileTopBar>
                 <StyledLogoLink to="/">
                   <SVG src={this.state.iconURL} />
@@ -145,11 +144,11 @@ class NavBar extends React.Component<Props, State> {
                   )}
                 </p>
               </MobileTopBar>
-            </MediaQuery>
+            </Mobile>
 
             <SideBarNavigationItems>
               <div style={{ display: "flex", flexDirection: "column" }}>
-                <MediaQuery minWidth={768}>
+                <Default>
                   <div
                     style={{
                       display: "flex",
@@ -223,7 +222,7 @@ class NavBar extends React.Component<Props, State> {
                     }}
                     onClick={() => this.toggleSwitchOrgDropdown()}
                   />
-                </MediaQuery>
+                </Default>
 
                 <NavWrapper mobileMenuOpen={this.state.mobileMenuOpen}>
                   <div style={{ display: "flex", flexDirection: "column" }}>

@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import UploadButton from "../uploader/uploadButton.jsx";
 import UploadedTable from "../uploader/uploadedTable.jsx";
-import SideBar from "../navBar";
+import SideBar from "../navBar/navBar";
 
 const mapStateToProps = state => {
   return {
@@ -53,7 +53,10 @@ const uploadPage = ({ loggedIn, spreadsheetData, location }) => {
   }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(uploadPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(uploadPage);
 
 const WrapperDiv = styled.div`
   //width: 100vw;

@@ -56,7 +56,7 @@ import { ThemeProvider } from "styled-components";
 import { DefaultTheme } from "./components/theme.js";
 import { browserHistory } from "./app.jsx";
 import LoadingSpinner from "./components/loadingSpinner.jsx";
-import NavBar from "./components/navBar";
+import NavBar from "./components/navBar/navBar";
 
 const mapStateToProps = state => {
   return {
@@ -275,4 +275,7 @@ const PublicRoute = ({ component: Component, ...rest }) => (
   />
 );
 
-export default connect(mapStateToProps, null)(Nav);
+export default connect(
+  mapStateToProps,
+  null
+)(Nav);
