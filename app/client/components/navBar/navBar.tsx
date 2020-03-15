@@ -8,6 +8,8 @@ import { LoginAction } from "../../reducers/auth/actions";
 import { LoginState, OrganisationFlat } from "../../reducers/auth/loginReducer";
 import { ReduxState } from "../../reducers/rootReducer";
 import { replaceSpaces } from "../../utils";
+import { SVG, StyledLogoLink } from "./styles";
+import MobileTopBar from "./MobileTopBar";
 
 interface StateProps {
   loggedIn: boolean;
@@ -128,22 +130,12 @@ class NavBar extends React.Component<Props, State> {
         <div>
           <SideBarWrapper mobileMenuOpen={this.state.mobileMenuOpen}>
             <Mobile>
-              <MobileTopBar>
-                <StyledLogoLink to="/">
-                  <SVG src={this.state.iconURL} />
-                </StyledLogoLink>
-                <Title>{this.props.email}</Title>
-                <p
-                  style={{ margin: "auto 1em", color: "#FFF" }}
-                  onClick={() => this.openMobileMenu()}
-                >
-                  {this.state.mobileMenuOpen ? (
-                    <SVG src="/static/media/close.svg" />
-                  ) : (
-                    <SVG src="/static/media/stack.svg" />
-                  )}
-                </p>
-              </MobileTopBar>
+              <MobileTopBar
+                iconUrl={this.state.iconURL}
+                email={this.props.email}
+                menuOpen={this.state.mobileMenuOpen}
+                onPress={() => this.openMobileMenu()}
+              />
             </Mobile>
 
             <SideBarNavigationItems>
@@ -334,16 +326,6 @@ const SideBarNavigationItems = styled.div`
   flex-direction: column;
 `;
 
-const SVG = styled.img`
-  width: 35px;
-  padding: 1em 0;
-  display: flex;
-  @media (max-width: 767px) {
-    padding: 0;
-    width: 30px;
-  }
-`;
-
 const activeClassName = "active-link";
 
 const StyledLink = styled(NavLink).attrs({
@@ -361,25 +343,6 @@ const StyledLink = styled(NavLink).attrs({
   }
   @media (max-width: 767px) {
     font-size: 16px;
-  }
-`;
-
-const MobileTopBar = styled.div`
-  width: inherit;
-  display: flex;
-  justify-content: space-between;
-  height: 50px;
-`;
-
-const StyledLogoLink = styled(NavLink)`
-  color: #fff;
-  margin: auto 1em;
-  font-size: 22px;
-  font-weight: 600;
-  text-decoration: none;
-  letter-spacing: 1.5px;
-  @media (max-width: 767px) {
-    margin: auto 0.5em;
   }
 `;
 
