@@ -131,7 +131,6 @@ class CreateUserUpdated extends React.Component<Props> {
       return (
         <CreateUserForm
           users={this.props.users}
-          transferAccountType={transferAccountType}
           transferUsages={this.props.transferUsages}
           onSubmit={(form: Form) => this.onCreateUser(form)}
         />
