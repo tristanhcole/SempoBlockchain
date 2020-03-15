@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-import { LoginState } from "../../reducers/auth/loginReducer";
 import { ReduxState } from "../../reducers/rootReducer";
 import { replaceSpaces } from "../../utils";
 import MobileTopBar from "./MobileTopBar";
