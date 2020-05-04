@@ -6,12 +6,14 @@
 
 [![CircleCI](https://circleci.com/gh/teamsempo/SempoBlockchain.svg?style=shield)](https://circleci.com/gh/teamsempo/SempoBlockchain)
 [![GitHub](https://img.shields.io/github/license/teamsempo/sempoblockchain)](LICENSE)
+[![Codecov](https://img.shields.io/codecov/c/github/teamsempo/SempoBlockchain)](https://codecov.io/gh/teamsempo/SempoBlockchain)
 
 Sempo Admin Dashboard and crypto financial inclusion infrastructure with USSD, Android and NFC Payments
 
 ## To run locally:
 
 ### Install Requirements
+
 **Postgres**
 
 We use [postgres](https://www.postgresql.org/) for regular (non-blockchain) data persistance.
@@ -26,7 +28,7 @@ If you plan on using the quick setup script, be sure to install the [PSQL](https
 You can use your preferred implementation of the Ethereum Blockchain to test things locally. Our setup scripts use the v6.4.1 [Ganache-CLI](https://github.com/trufflesuite/ganache-cli)
 
 ```
-npm install ganache-cli@6.4.1
+npm install -g ganache-cli@6.4.1
 ```
 
 **Python**
@@ -34,9 +36,9 @@ npm install ganache-cli@6.4.1
 Download and install python 3.6 and its respective pip and virtualenv (**python 3.7 will break things**). Then:
 
 ```
-python3 -m venv venv
+python3 -m venv venv
 source venv/bin/activate
-./install.sh
+./devtools/install_python_requirements.sh
 ```
 
 **Front-End**
@@ -49,11 +51,13 @@ npm install
 ```
 
 To build and watch for changes:
+
 ```
 npm run dev
 ```
 
 ### Create config files
+
 The platform uses three kinds of config files:
 
 - deployment specific config: things that aren't sensitive, and change on a per deployment basis
@@ -65,23 +69,26 @@ To create some suitable secrets quickly:
 
 ```
 cd config files
-python generate_dev_test_secrets.py
+python generate_secrets.py
 ```
 
 ### Quick Setup Script
 
 (Requires PSQL to run)
 
-For quick setup, run `quick_setup_script.sh` with `MASTER_WALLET_PK` set as an environment variable to the master private key found in `/config_files/secret/local_secrets.ini/`.
+For quick setup, run `./devtools/quick_setup_script.sh` with `MASTER_WALLET_PK` set as an environment variable to the master private key found in `/config_files/secret/local_secrets.ini/`.
 
 ```
 quick_setup_script.sh [activation path for your python env]
 ```
+
 The script will:
+
 - Reset your local Sempo state
 - Launch Ganache and Redis
 - Create an adminstrator account with email `admin@acme.org` and password `C0rrectH0rse`
 - Create a reserve token and bonded token
+
 When the script has finished running*, you can start your own app and worker processes (see next section) and continue on.
 \*This can be a little hard to identify because ganache continues to run, but a good indicator is if `Bringing Ganache to foreground` is echo'd in the console
 
@@ -95,6 +102,7 @@ python ./run.py
 ### Launch the worker
 
 Transaction on the blockchain are made using asynchronous workers that consume a celery task-queue.
+
 ```
 cd eth_worker
 celery -A eth_manager worker --loglevel=INFO --concurrency=8 --pool=eventlet -Q=celery,processor
@@ -214,9 +222,21 @@ alembic revision --autogenerate
 
 (if you have installed the prod vendor app, ensure you clear data and uninstall before installing from dev)
 
+### USSD Interface
+
+To run and test the USSD interface locally there are two options.
+
+- Run `./devtools/ussd.py` with the necessary environment variables
+- Setup ngrok and use Africa's Talking or another USSD simulator
+
 ## Testing
 
-Ensure your test_config.ini is up to date.
+Ensure your test_config.ini and test_secrets.ini files are up to date. Test secrets can be generated using the previous python script, and supplying `test` as the filename:
+
+```
+cd config files
+python generate_secrets.py test
+```
 
 Create the test databases:
 
@@ -230,6 +250,7 @@ Ensure redis-server is running (this is not ideal but necessary atm).
 Then run `python invoke_tests.py`, or if that doesn't work, set it up as a runnable in PyCharm: Run -> Edit Configurations -> Add New Configuration (Python) -> set script path as `SempoBlockchain/invoke_tests.py`
 
 ## Seed Data
+
 (Currently broken!!)
 You can quickly create seed data for a local machine, including exchanges and blockchain transactions:
 

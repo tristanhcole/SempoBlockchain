@@ -1,8 +1,10 @@
 from functools import reduce
 import requests
-import config
 from time import sleep
-import os
+import os, sys
+
+sys.path.append('./')
+import config
 
 def load_account(address, amount_wei):
     from web3 import (
@@ -119,7 +121,6 @@ class Setup(object):
         print(f'Reserve Token id: {token_id}')
 
         self._wait_for_get_result(f'contract/token/{token_id}/', ('data', 'token', 'address'))
-
         return token_id
 
     def create_exchange_contract(self, reserve_token_id):

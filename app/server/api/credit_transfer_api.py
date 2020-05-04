@@ -9,7 +9,6 @@ from server import db
 from server.models.token import Token
 from server.models.utils import paginate_query
 from server.models.credit_transfer import CreditTransfer
-from server.models.blockchain_transaction import BlockchainTransaction
 from server.models.blockchain_address import BlockchainAddress
 from server.schemas import credit_transfers_schema, credit_transfer_schema, view_credit_transfers_schema
 from server.utils.auth import requires_auth
@@ -180,6 +179,8 @@ class CreditTransferAPI(MethodView):
 
         uuid = post_data.get('uuid')
 
+        queue = 'low-priority'
+
         transfer_type = post_data.get('transfer_type')
         transfer_amount = abs(round(float(post_data.get('transfer_amount') or 0),6))
         token_id = post_data.get('token_id')
@@ -281,7 +282,6 @@ class CreditTransferAPI(MethodView):
 
 
         for sender_user, recipient_user in transfer_user_list:
-
             try:
                 if transfer_type == 'PAYMENT':
                     transfer = make_payment_transfer(
@@ -291,7 +291,8 @@ class CreditTransferAPI(MethodView):
                         receive_user=recipient_user,
                         transfer_use=transfer_use,
                         uuid=uuid,
-                        automatically_resolve_complete=auto_resolve)
+                        automatically_resolve_complete=auto_resolve,
+                        queue=queue)
 
                 elif transfer_type == 'RECLAMATION':
                     transfer = make_payment_transfer(
@@ -301,7 +302,9 @@ class CreditTransferAPI(MethodView):
                         uuid=uuid,
                         transfer_subtype=TransferSubTypeEnum.RECLAMATION,
                         require_recipient_approved=False,
-                        automatically_resolve_complete=auto_resolve)
+                        automatically_resolve_complete=auto_resolve,
+                        queue=queue
+                    )
 
                 elif transfer_type == 'DISBURSEMENT':
                     transfer = make_payment_transfer(
@@ -311,14 +314,16 @@ class CreditTransferAPI(MethodView):
                         receive_user=recipient_user,
                         uuid=uuid,
                         transfer_subtype=TransferSubTypeEnum.DISBURSEMENT,
-                        automatically_resolve_complete=auto_resolve)
+                        automatically_resolve_complete=auto_resolve,
+                        queue=queue)
 
                 elif transfer_type == 'BALANCE':
                     transfer = make_target_balance_transfer(
                         target_balance,
                         recipient_user,
                         uuid=uuid,
-                        automatically_resolve_complete=auto_resolve)
+                        automatically_resolve_complete=auto_resolve,
+                        queue=queue)
 
             except (InsufficientBalanceError,
                     AccountNotApprovedError,
@@ -336,7 +341,6 @@ class CreditTransferAPI(MethodView):
 
             else:
                 message = 'Transfer Successful' if auto_resolve else 'Transfer Pending. Must be approved.'
-
                 if is_bulk:
                     credit_transfers.append(transfer)
 
@@ -358,7 +362,6 @@ class CreditTransferAPI(MethodView):
                     return make_response(jsonify(response_object)), 201
 
         db.session.flush()
-
         message = 'Bulk Transfer Creation Successful' if auto_resolve else 'Bulk Transfer Pending. Must be approved.'
         response_object = {
             'message': message,
@@ -413,12 +416,6 @@ class InternalCreditTransferAPI(MethodView):
         sender_blockchain_address = post_data.get('sender_blockchain_address')
         recipient_blockchain_address = post_data.get('recipient_blockchain_address')
         blockchain_transaction_hash = post_data.get('blockchain_transaction_hash')
-
-        if BlockchainTransaction.query.filter_by(hash=blockchain_transaction_hash).first():
-            response_object = {
-                'message': 'Transaction hash already used',
-            }
-            return make_response(jsonify(response_object)), 400
 
         send_address_obj = (BlockchainAddress.query
                             .filter_by(address=sender_blockchain_address)

@@ -19,7 +19,6 @@ from server.models.transfer_usage import TransferUsage
 from server.models.transfer_account import TransferAccount
 from server.models.blockchain_address import BlockchainAddress
 from server.models.credit_transfer import CreditTransfer
-from server.models.blockchain_transaction import BlockchainTransaction
 from server.models.user import User
 from server.schemas import me_credit_transfer_schema
 from server.utils import user as UserUtils
@@ -143,7 +142,6 @@ def make_blockchain_transfer(transfer_amount,
                              uuid=None,
                              existing_blockchain_txn=False
                              ):
-
     send_address_obj = create_address_object_if_required(send_address)
     receive_address_obj = create_address_object_if_required(receive_address)
 
@@ -177,25 +175,12 @@ def make_blockchain_transfer(transfer_amount,
     if uuid:
         transfer.uuid = uuid
 
-    if existing_blockchain_txn:
-        existing_blockchain_txn_obj = BlockchainTransaction(
-            status='SUCCESS',
-            message='External Txn',
-            added_date=datetime.datetime.utcnow(),
-            hash=existing_blockchain_txn,
-            transaction_type='transfer'
-        )
-
-        existing_blockchain_txn_obj.credit_transfer = transfer
-        db.session.add(existing_blockchain_txn_obj)
-
     if automatically_resolve_complete:
         transfer.resolve_as_completed(existing_blockchain_txn=existing_blockchain_txn)
 
     pusher.push_admin_credit_transfer(transfer)
 
     return transfer
-
 
 def make_payment_transfer(transfer_amount,
                           token=None,
@@ -211,7 +196,8 @@ def make_payment_transfer(transfer_amount,
                           automatically_resolve_complete=True,
                           uuid=None,
                           transfer_subtype: TransferSubTypeEnum=TransferSubTypeEnum.STANDARD,
-                          is_ghost_transfer=False):
+                          is_ghost_transfer=False,
+                          queue='high-priority'):
     """
     This is used for internal transfers between Sempo wallets.
     :param transfer_amount:
@@ -297,7 +283,7 @@ def make_payment_transfer(transfer_amount,
         raise InsufficientBalanceError(message)
 
     if automatically_resolve_complete:
-        transfer.resolve_as_completed()
+        transfer.resolve_as_completed(queue=queue)
         pusher.push_admin_credit_transfer(transfer)
 
     if make_cashout_incentive_transaction:
@@ -401,7 +387,8 @@ def make_target_balance_transfer(target_balance,
                                  require_target_user_approved=True,
                                  require_sufficient_balance=True,
                                  automatically_resolve_complete=True,
-                                 uuid=None):
+                                 uuid=None,
+                                 queue='high-priority'):
     if target_balance is None:
         raise InvalidTargetBalanceError("Target balance not provided")
 
@@ -420,7 +407,8 @@ def make_target_balance_transfer(target_balance,
                                          require_sufficient_balance=require_sufficient_balance,
                                          automatically_resolve_complete=automatically_resolve_complete,
                                          uuid=uuid,
-                                         transfer_subtype=TransferSubTypeEnum.RECLAMATION)
+                                         transfer_subtype=TransferSubTypeEnum.RECLAMATION,
+                                         queue=queue)
 
     else:
         transfer = make_payment_transfer(transfer_amount,
@@ -429,7 +417,8 @@ def make_target_balance_transfer(target_balance,
                                          transfer_mode=transfer_mode,
                                          automatically_resolve_complete=automatically_resolve_complete,
                                          uuid=uuid,
-                                         transfer_subtype=TransferSubTypeEnum.DISBURSEMENT)
+                                         transfer_subtype=TransferSubTypeEnum.DISBURSEMENT,
+                                         queue=queue)
 
     return transfer
 
